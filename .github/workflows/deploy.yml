@@ -1,0 +1,26 @@
+name: Github Page Deploy Workflow
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: npm ci --ignore-scripts
+      # Build with Vite directly: mate-scripts ignores the configured base path,
+      # which is what produced the 404s on the /phone_catalogue_react/ sub-path.
+      - run: npx vite build
+      - name: Deploy
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./dist
